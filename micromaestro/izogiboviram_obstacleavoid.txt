@@ -1,0 +1,113 @@
+<!--Pololu Maestro servo controller settings file, http://www.pololu.com/catalog/product/1350-->
+<UscSettings version="1">
+  <NeverSuspend>false</NeverSuspend>
+  <SerialMode>USB_DUAL_PORT</SerialMode>
+  <FixedBaudRate>9600</FixedBaudRate>
+  <SerialTimeout>0</SerialTimeout>
+  <EnableCrc>false</EnableCrc>
+  <SerialDeviceNumber>12</SerialDeviceNumber>
+  <SerialMiniSscOffset>0</SerialMiniSscOffset>
+  <Channels ServosAvailable="6" ServoPeriod="156">
+    <!--Period = 19,968 ms-->
+    <!--Channel 0-->
+    <Channel name="" mode="Input" min="0" max="1024" homemode="Ignore" home="0" speed="0" acceleration="0" neutral="1024" range="1905" />
+    <!--Channel 1-->
+    <Channel name="" mode="Input" min="0" max="1024" homemode="Ignore" home="0" speed="0" acceleration="0" neutral="1024" range="1905" />
+    <!--Channel 2-->
+    <Channel name="" mode="Output" min="3968" max="8000" homemode="Ignore" home="3968" speed="0" acceleration="0" neutral="6000" range="1905" />
+    <!--Channel 3-->
+    <Channel name="" mode="Output" min="3968" max="8000" homemode="Ignore" home="3968" speed="0" acceleration="0" neutral="6000" range="1905" />
+    <!--Channel 4-->
+    <Channel name="" mode="Servo" min="3968" max="8000" homemode="Off" home="3968" speed="0" acceleration="0" neutral="6000" range="1905" />
+    <!--Channel 5-->
+    <Channel name="" mode="Servo" min="3968" max="8000" homemode="Off" home="3968" speed="0" acceleration="0" neutral="6000" range="1905" />
+  </Channels>
+  <Sequences>
+    <Sequence name="Sequence 0">
+      <Frame name="Frame 0" duration="500">0 0 0 0 0 0</Frame>
+    </Sequence>
+  </Sequences>
+  <Script ScriptDone="false">
+
+#si-izogibanje oviram s sharp senzorji (optièni 2-10 cm)
+#en-obstacle avoiding with sharp sensor (optical 2-10 cm)
+#prohobi.net 2017
+
+#si-levi servo na vrata 4 (nastavljeno kot servo)
+#en-left servo on port 4 (set as servo)
+
+#si-desni servo na vrata 5 (nastavljeno kot servo)
+#en-right servo on port 5 (set as servo)
+
+#si-levi senzor na vrata 1 (nastavljeno kot input)
+#en-left sensor on port 1 (set as input)
+
+#si-desni senzor na vrata 0 (nastavljeno kot input)
+#en-right sensor on port 0 (set as input)
+
+
+goto start
+
+start:
+ lsenzor dsenzor logical_and if goto zacetek endif
+goto start
+
+
+ goto zacetek
+
+zacetek:
+  lsenzor dsenzor logical_and if goto nazaj endif
+  lsenzor if desninazaj else desninaprej endif
+  dsenzor if levinazaj else levinaprej endif
+goto zacetek
+
+nazaj:
+  desninazaj levinazaj
+  lsenzor dsenzor logical_and if else goto zacetek endif
+goto nazaj
+
+
+
+ sub levinaprej
+  5200 4 servo
+ return
+
+ sub desninaprej
+   6320 5 servo
+
+ return
+
+ sub levinazaj
+  4600 4 servo
+ return
+
+ sub desninazaj
+  6960 5 servo
+ return
+
+ sub levistop
+  6000 4 servo
+ return
+
+ sub desnistop
+  6000 5 servo
+ return
+
+ sub stop
+  desnistop levistop
+ return
+
+
+sub lsenzor
+  1 get_position 512 less_than
+return
+
+sub dsenzor
+  0 get_position 512 less_than
+return
+
+sub pr
+  100 delay
+return
+  </Script>
+</UscSettings>
